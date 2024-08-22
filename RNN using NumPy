@@ -1,0 +1,105 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPRAQNv/Twx+FD1yJOGNge1",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/223T1A3122/DLCOLAB/blob/main/RNN%20using%20NumPy\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 3,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "STpaXftZPZtC",
+        "outputId": "a88a2942-464c-4d25-8411-35b15f0fc676"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Time step 0: [[0.33355321 0.33295164 0.33349514]]\n",
+            "Time step 1: [[0.33336319 0.33308185 0.33355496]]\n",
+            "Time step 2: [[0.33310273 0.33361004 0.33328724]]\n",
+            "Time step 3: [[0.33350126 0.33292074 0.33357799]]\n"
+          ]
+        }
+      ],
+      "source": [
+        "import numpy as np\n",
+        "def tanh(x):\n",
+        "    return np.tanh(x)\n",
+        "def softmax(x):\n",
+        "    exps = np.exp(x - np.max(x))\n",
+        "    return exps / np.sum(exps, axis=1, keepdims=True)\n",
+        "\n",
+        "class SimpleRNN:\n",
+        "    def __init__(self, input_size, hidden_size, output_size):\n",
+        "        self.W_xh = np.random.randn(input_size, hidden_size) * 0.01\n",
+        "        self.W_hh = np.random.randn(hidden_size, hidden_size) * 0.01\n",
+        "        self.W_hy = np.random.randn(hidden_size, output_size) * 0.01\n",
+        "\n",
+        "        self.b_h = np.zeros((1, hidden_size))\n",
+        "        self.b_y = np.zeros((1, output_size))\n",
+        "\n",
+        "    def forward(self, inputs):\n",
+        "        \"\"\"\n",
+        "        Perform the forward pass of the RNN.\n",
+        "        inputs: list of input vectors (sequence length, input_size)\n",
+        "        returns: output vector for each time step\n",
+        "        \"\"\"\n",
+        "        h = np.zeros((1, self.W_hh.shape[0]))\n",
+        "        outputs = []\n",
+        "\n",
+        "        for x in inputs:\n",
+        "            x = x.reshape(1, -1)\n",
+        "            h = tanh(np.dot(x, self.W_xh) + np.dot(h, self.W_hh) + self.b_h)\n",
+        "            y = np.dot(h, self.W_hy) + self.b_y\n",
+        "            output = softmax(y)\n",
+        "            outputs.append(output)\n",
+        "\n",
+        "        return outputs\n",
+        "\n",
+        "np.random.seed(42)\n",
+        "\n",
+        "\n",
+        "input_size = 5\n",
+        "hidden_size = 10\n",
+        "output_size = 3\n",
+        "sequence_length = 4\n",
+        "\n",
+        "rnn = SimpleRNN(input_size, hidden_size, output_size)\n",
+        "\n",
+        "inputs = [np.random.randn(input_size) for _ in range(sequence_length)]\n",
+        "\n",
+        "outputs = rnn.forward(inputs)\n",
+        "\n",
+        "for t, output in enumerate(outputs):\n",
+        "    print(f\"Time step {t}: {output}\")\n"
+      ]
+    }
+  ]
+}
